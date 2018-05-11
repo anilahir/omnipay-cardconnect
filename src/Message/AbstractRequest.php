@@ -148,7 +148,17 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
             )
             ->send();
 
-        return $this->response = new Response($this, $httpResponse->json());
+        try {
+            $jsonRes = $httpResponse->json();
+        }
+        catch (\Exception $e){
+            info('Guzzle response : ', [$httpResponse]);
+            $res = [];
+            $res['resptext'] = 'Oops! something went wrong, Try again after sometime.';
+            return $this->response = new Response($this, $res);
+        }
+
+        return $this->response = new Response($this, $jsonRes);
     }
 }
 
