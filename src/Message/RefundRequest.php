@@ -2,6 +2,8 @@
 
 namespace Omnipay\Cardconnect\Message;
 
+use Omnipay\Common\Exception\InvalidRequestException;
+
 class RefundRequest extends AbstractRequest
 {
     public function getEndpoint()
@@ -20,13 +22,18 @@ class RefundRequest extends AbstractRequest
     {
         $this->validate('amount', 'transactionReference');
 
-        $transactionReference = json_decode($this->getTransactionReference());
+        try {
+            $transactionReference = json_decode($this->getTransactionReference());
 
-        $data = [
-            'merchid' => $this->getMerchantId(),
-            'retref' => $transactionReference->retref,
-            'amount' => $this->getAmount()
-        ];
+            $data = [
+                'merchid' => $this->getMerchantId(),
+                'retref' => $transactionReference->retref,
+                'amount' => $this->getAmount()
+            ];
+        }
+        catch (\Exception $e) {
+            throw new InvalidRequestException('Invalid transaction reference');
+        }
 
         return json_encode($data);
     }

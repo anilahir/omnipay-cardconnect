@@ -2,6 +2,8 @@
 
 namespace Omnipay\Cardconnect\Message;
 
+use Omnipay\Common\Exception\InvalidRequestException;
+
 class PurchaseRequest extends AbstractRequest
 {
     public function getEndpoint()
@@ -35,13 +37,21 @@ class PurchaseRequest extends AbstractRequest
                 break;
 
             case 'payment_profile' :
+
                 if ($this->getCardReference()) {
-                    $cardReference = json_decode($this->getCardReference());
-                    $data['account'] = $cardReference->account;
-                    $data['expiry'] = $cardReference->expiry;
-                    $data['profile'] = $cardReference->profile;
-                    $data['acctid'] = $cardReference->acctid;
+
+                    try {
+                        $cardReference = json_decode($this->getCardReference());
+                        $data['account'] = $cardReference->account;
+                        $data['expiry'] = $cardReference->expiry;
+                        $data['profile'] = $cardReference->profile;
+                        $data['acctid'] = $cardReference->acctid;
+                    }
+                    catch (\Exception $e) {
+                        throw new InvalidRequestException('Invalid payment profile');
+                    }
                 }
+
                 break;
 
             case 'token' :
