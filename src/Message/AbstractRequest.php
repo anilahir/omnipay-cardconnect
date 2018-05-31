@@ -110,46 +110,20 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 
     public function sendData($data)
     {
-        $header = base64_encode($this->getUsername() . ':' . $this->getPassword());
-
-        // Don't throe exceptions for 4xx errors
-        $this->httpClient->getEventDispatcher()->addListener(
-            'request.error',
-            function ($event) {
-                if($event['response']->isClientError()) {
-                    $event->stopPropagation();
-                }
-            }
-        );
+        $headers = [
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Basic ' . base64_encode($this->getUsername() . ':' . $this->getPassword())
+        ];
 
         if (!empty($data)) {
-            $httpRequest = $this->httpClient->createRequest(
-                $this->getHttpMethod(),
-                $this->getEndpoint(),
-                null,
-                $data
-            );
+            $httpResponse = $this->httpClient->request($this->getHttpMethod(), $this->getEndpoint(), $headers, $data);
         }
         else {
-            $httpRequest = $this->httpClient->createRequest(
-                $this->getHttpMethod(),
-                $this->getEndpoint()
-            );
+            $httpResponse = $this->httpClient->request($this->getHttpMethod(), $this->getEndpoint(), $headers);
         }
 
-        $httpResponse = $httpRequest
-            ->setHeader(
-                'Content-Type',
-                'application/json'
-            )
-            ->setHeader(
-                'Authorization',
-                'Basic ' . $header
-            )
-            ->send();
-
         try {
-            $jsonRes = $httpResponse->json();
+            $jsonRes = json_decode($httpResponse->getBody()->getContents(), true);
         }
         catch (\Exception $e){
             info('Guzzle response : ', [$httpResponse]);
