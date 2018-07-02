@@ -62,6 +62,16 @@ class Response extends AbstractResponse
     {
         return isset($this->data['order_number']) ? $this->data['order_number'] : null;
     }
+	
+	public function getProfileId()
+	{
+		return isset($this->data['profileid']) ? $this->data['profileid'] : null;
+	}
+	
+	public function getAcctId()
+	{
+		return isset($this->data['acctid']) ? $this->data['acctid'] : null;
+	}
 
     public function getData()
     {

@@ -107,6 +107,16 @@ abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     {
         return $this->setParameter('order_number', $value);
     }
+    
+    public function getAccount()
+    {
+	    return $this->getParameter('account');
+    }
+	
+	public function setAccount($value)
+	{
+		return $this->setParameter('account', $value);
+	}
 
     public function sendData($data)
     {
